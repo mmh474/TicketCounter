@@ -1,0 +1,70 @@
+.controls {
+    height: 80px;
+    width: 300px;
+    float: left;
+    margin-left: 10px;
+}
+
+.controls2 {
+    height: 30px;
+    width: 30px;
+    margin-left: 10px;
+    margin-top: 10px;
+}
+
+.filter {
+    height: 20px;
+    margin-top: 10px;
+}
+
+.refresh {
+    height: 20px;
+    width: 20px;
+}
+
+.totals {
+    margin: 20px auto;
+    font-size: 13px;
+    line-height: 20px;
+    margin-bottom: 10px;
+    text-align: center;
+    display: table;
+}
+
+.totalColumn {
+    display: table-cell;
+    text-align: left;
+    padding: 0px 10px;
+}
+
+.totalLabel {
+    font-weight: bold;
+}
+
+svg {
+    font-size: 16px;
+    width: 20px;
+}
+
+#spinnerDiv {
+    margin: 0 auto;
+    width: 50px;
+    top: 50%;
+    left: 50%;
+    position: absolute;
+}
+
+.opacity {
+    opacity: 0.5;
+}
+
+.error {
+    color: red;
+    margin-top: 10px;
+    margin-left: 10px;
+    display: block;
+}
+
+.paginator-container {
+    margin: 10px 0 20px;
+}

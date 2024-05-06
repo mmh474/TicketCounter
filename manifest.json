@@ -1,0 +1,26 @@
+{
+  "name": "Agent Ticket Counts",
+  "author": {
+    "name": "Vision33",
+    "email": "helpdesk@vision33.com",
+    "url": "https://www.vision33.com"
+  },
+  "defaultLocale": "en",
+  "private": false,
+  "location": {
+    "support": {
+      "nav_bar": "assets/iframe.html"
+    }
+  },
+  "version": "2.0",
+  "frameworkVersion": "2.0",
+  "parameters": [
+    {
+      "name": "include_suspended_agents",
+      "type": "checkbox",
+      "required": false,
+      "secure": false,
+      "default": "false"
+    }
+  ]
+}

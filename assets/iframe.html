@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Agent Ticket Counts</title>
+  <link href="//cdn.jsdelivr.net/combine/npm/@zendeskgarden/css-bedrock,npm/@zendeskgarden/css-grid,npm/@zendeskgarden/css-buttons,npm/@zendeskgarden/css-forms,npm/@zendeskgarden/css-utilities,npm/@zendeskgarden/css-tables,npm/@zendeskgarden/css-pagination" rel="stylesheet">
+  <link href="main.css" type="text/css" rel="stylesheet">
+</head>
+<body>
+
+    <div id="container">
+      <div id="spinnerDiv">
+        <img src="spinner.gif" />
+      </div>
+      <div id="svg-container" style="display: none"></div>
+      <div id="content" />
+    </div>
+
+    <script id="requester-template" type="text/x-handlebars-template">
+      <div class="controls">
+        <div class="refresh">
+          <a id="refreshBtn" href="#" onclick="reload()">
+            <svg>
+              <!--<use xlink:href="//cdn.jsdelivr.net/npm/@zendeskgarden/svg-icons@6.3.0/dist/index.svg#zd-svg-icon-16-reload-fill"></use>-->
+              <use xmlns:xlink="https://www.w3.org/1999/xlink" xlink:href="#zd-svg-icon-16-reload-fill"></use>
+            </svg>
+          </a>
+        </div>
+
+        <div class="filter">
+          <form>
+            <div class="c-txt">
+              <select class="c-txt__input c-txt__input--select" id="select-display"
+                      onchange="displayChanged()">
+                {{#if AllAgentsEnabled}}
+                <option value="allAgents" {{#if AllAgentsSelected}}selected{{/if}}>Show all agents</option>
+                {{/if}}
+                {{#if OrganizationEnabled}}
+                <option value="organization" {{#if OrganizationSelected}}selected{{/if}}>Show agents in my Organization</option>
+                {{/if}}
+                {{#if GroupsEnabled}}
+                {{#each Groups}}
+                <option value="group:{{id}}" {{#if selected}}selected{{/if}}>Show agents in group: {{name}}</option>
+                {{/each}}
+                {{/if}}
+                {{#if OnlyMineEnabled}}
+                <option value="onlyMine" {{#if OnlyMeSelected}}selected{{/if}}>Only me</option>
+                {{/if}}
+              </select>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="totals">
+      <div class="totalColumn">
+        <span class="totalLabel">Total New Tickets: </span> {{NewTickets}} <br>
+        <span class="totalLabel">Total Open Tickets: </span> {{OpenTickets}} <br>
+      </div>
+      <div class="totalColumn">
+        <span class="totalLabel">Total Pending Tickets: </span> {{PendingTickets}} <br>
+        {{#if OnHoldEnabled}}
+        <span class="totalLabel">Total Tickets on Hold: </span>{{OnHoldTickets}}
+      </div>
+      <div class="totalColumn">
+        <span class="totalLabel">Total Unsolved Tickets: </span> {{UnsolvedTickets}} <br>
+      </div>
+      {{else}}
+      <span class="totalLabel">Total Unsolved Tickets: </span> {{UnsolvedTickets}}
+    </div>
+        {{/if}}
+    </div>
+
+    <table class="c-table u-bg-white">
+      <thead>
+      <tr class="c-table__row c-table__row--header">
+        <th class="c-table__row__cell c-table__row__cell--truncate">
+          <button class="c-table__row__cell__sortable {{#if NameColumnSortingAsc}}is-ascending{{/if}}{{#if NameColumnSortingDesc}}is-descending{{/if}}"
+                  type="button" onclick="sortByName()">Agent Name</button>
+        </th>
+        <th class="c-table__row__cell c-table__row__cell--truncate">
+          <button class="c-table__row__cell__sortable {{#if OpenColumnSortingAsc}}is-ascending{{/if}}{{#if OpenColumnSortingDesc}}is-descending{{/if}}"
+                  type="button" onclick="sortByOpen()">Open Tickets</button>
+        </th>
+        <th class="c-table__row__cell c-table__row__cell--truncate">
+          <button class="c-table__row__cell__sortable {{#if PendingColumnSortingAsc}}is-ascending{{/if}}{{#if PendingColumnSortingDesc}}is-descending{{/if}}"
+                  type="button" onclick="sortByPending()">Pending Tickets</button>
+        </th>
+        {{#if OnHoldEnabled}}
+        <th class="c-table__row__cell c-table__row__cell--truncate">
+          <button class="c-table__row__cell__sortable {{#if OnHoldColumnSortingAsc}}is-ascending{{/if}}{{#if OnHoldColumnSortingDesc}}is-descending{{/if}}"
+                  type="button" onclick="sortByOnHold()">On-Hold Tickets</button>
+        </th>
+        {{/if}}
+        <th class="c-table__row__cell c-table__row__cell--truncate">
+          <button class="c-table__row__cell__sortable {{#if TotalColumnSortingAsc}}is-ascending{{/if}}{{#if TotalColumnSortingDesc}}is-descending{{/if}}"
+                  type="button" onclick="sortByTotal()">Total Tickets</button>
+        </th>
+      </tr>
+      </thead>
+      <tbody>
+      {{#each Agents}}
+      <tr class="c-table__row">
+
+        <td class="c-table__row__cell">{{name}}</td>
+        <td class="c-table__row__cell">{{openCount}}</td>
+        <td class="c-table__row__cell">{{pendingCount}}</td>
+        {{#if ../OnHoldEnabled}}
+        <td class="c-table__row__cell">{{onHoldCount}}</td>
+        {{/if}}
+        <td class="c-table__row__cell">{{totalCount}}</td>
+      </tr>
+      {{/each}}
+      </tbody>
+    </table>
+
+    <div class="paginator-container">
+      {{paginator Pages CurrentPage}}
+    </div>
+
+  </script>
+
+  <script id="error-template" type="text/x-handlebars-template">
+    <div class="controls2">
+      <div class="refresh">
+        <a id="refreshBtn2" href="#" onclick="reload()">
+          <svg>
+            <!--<use xlink:href="//cdn.jsdelivr.net/npm/@zendeskgarden/svg-icons@6.3.0/dist/index.svg#zd-svg-icon-16-reload-fill"></use>-->
+            <use xmlns:xlink="https://www.w3.org/1999/xlink" xlink:href="#zd-svg-icon-16-reload-fill"></use>
+          </svg>
+        </a>
+      </div>
+    </div>
+    <div class="error">
+      <span>
+          {{ error_message }}
+      </span>
+    </div>
+  </script>
+
+  <script type="text/javascript" src="https://static.zdassets.com/zendesk_app_framework_sdk/2.0/zaf_sdk.min.js"></script>
+  <script src="//cdn.jsdelivr.net/combine/npm/jquery@3.4.1/dist/jquery.min.js,npm/underscore@1.9.1/underscore.min.js,npm/handlebars@4.1.2/dist/handlebars.min.js"></script>
+  <script type="text/javascript" src="main.js"></script>
+  <script type="text/javascript">
+      window.Handlebars.registerHelper('paginator', function(pages, currentPage){
+        if(pages < 2) {
+          return;
+        }
+        var out = '<ul class="c-pagination">'
+        if(currentPage !== 1) {
+          out = out + '<li class="c-pagination__page c-pagination__page--previous" onclick="changePage(' + (currentPage - 1) + ')">previous</li>';
+        }
+        if(pages < 10) {
+          for(i = 1; i <= pages; i++) {
+            out = out + '<li class="c-pagination__page';
+            if(i === page) {
+              out = out + ' is-current';
+            }
+            out = out + '" onclick="changePage(' + i + ')">' + i + '</li>';
+          }
+        } else {
+          out = out + '<li class="c-pagination__page';
+          if(page == 1) {
+            out = out + ' is-current';
+          }
+          out = out + '" onclick="changePage(1)">' + 1 + '</li>';
+          if(currentPage <= 6) {
+            for(i = 2; i <= 7; i++) {
+              out = out + '<li class="c-pagination__page';
+              if(i === page) {
+                out = out + ' is-current';
+              }
+              out = out + '" onclick="changePage(' + i + ')">' + i + '</li>';
+            }
+            out = out + '<li class="c-pagination__page c-pagination__page--gap">8-' + (pages - 1) + '</li>';
+            out = out + '<li class="c-pagination__page" onclick="changePage(' + pages + ')">' + pages + '</li>';
+          } else if(currentPage > 6) {
+            if((pages - currentPage) >= 6) {
+              out = out + '<li class="c-pagination__page c-pagination__page--gap">2-' + (currentPage - 1) + '</li>';
+              for(i = currentPage; i <= currentPage + 4; i++) {
+                out = out + '<li class="c-pagination__page';
+                if(i === page) {
+                  out = out + ' is-current';
+                }
+                out = out + '" onclick="changePage(' + i + ')">' + i + '</li>';
+              }
+              out = out + '<li class="c-pagination__page c-pagination__page--gap">' + (currentPage + 5) + '-' + (pages - 1) + '</li>';
+              out = out + '<li class="c-pagination__page" onclick="changePage(' + pages + ')">' + pages + '</li>';
+            } else {
+              out = out + '<li class="c-pagination__page c-pagination__page--gap">2-' + (currentPage - 5 + (pages - currentPage)) + '</li>';
+              for(i = currentPage - 5 + (pages - currentPage); i <= pages; i++) {
+                out = out + '<li class="c-pagination__page';
+                if(i === page) {
+                  out = out + ' is-current';
+                }
+                out = out + '" onclick="changePage(' + i + ')">' + i + '</li>';
+              }
+            }
+          }
+        }
+        if(currentPage !== pages) {
+          out = out + '<li class="c-pagination__page c-pagination__page--next" onclick="changePage(' + (currentPage + 1) + ')">next</li>';
+        }
+
+        return new Handlebars.SafeString(out);
+      });
+  </script>
+</body>
+</html>

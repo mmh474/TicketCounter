@@ -1,0 +1,14 @@
+{
+  "app": {
+    "name": "Agent Ticket Counts",
+    "short_description": "Get ticket counts divided per status for each agent.",
+    "long_description": "The Agent Ticket Counts app lets you quickly see ticket counts for each agent in your installation.  \n\n  Features:  \n\n  - See ticket counts for each user, divided by ticket status and total.  \n\n  - Show overall counts per status, including counts of unassigned tickets.  \n\n  - Filter agents by group or organization.  \n\n  - Sort agents by name, or by any of the specific counts, in either ascending or descending order.  \n\n  - Light agents are not displayed  \n\n  - Suspended agents are not displayed by default, but can be displayed through a setting.  \n\n  - Counts are automatically refreshed every time you open the app.",
+    "installation_instructions": "Simply click install. The only app setting is 'Include Suspended Agents'; if you select it, suspended agents will be visible in the app.",
+    "parameters": {
+      "include_suspended_agents": {
+        "label": "Include Suspended Agents",
+        "helpText": "Check this to show agents that are suspended."
+      }
+    }
+  }
+}
